@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>VillaManager - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="antialiased bg-slate-50 min-h-screen">
+    <div id="root"></div>
+
+    <!-- React (UMD) + ReactDOM (UMD) + Babel for JSX in-browser (dev/demo use only) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- App code (JSX) -->
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // Minimal icon components using emojis to avoid external icon deps
+        const Calendar = ({ size = 16, className = "" }) => <span style={{fontSize:size}} className={className}>📅</span>;
+        const ShoppingBag = ({ size = 16 }) => <span style={{fontSize:size}}>🛍️</span>;
+        const MapIcon = ({ size = 16 }) => <span style={{fontSize:size}}>🗺️</span>;
+        const Clock = ({ size = 16 }) => <span style={{fontSize:size}}>⏰</span>;
+        const MoreHorizontal = ({ size = 14, className = "" }) => <span style={{fontSize:size}} className={className}>⋯</span>;
+        const X = ({ size = 20 }) => <span style={{fontSize:size}}>✖️</span>;
+        const Plus = ({ size = 14 }) => <span style={{fontSize:size}}>➕</span>;
+        const Palmtree = ({ size = 24 }) => <span style={{fontSize:size}}>🌴</span>;
+
+        // --- DATA SOURCE ---
+        const INITIAL_BOOKINGS = [
+            { id: 1, name: "Hufmans R-V", dates: "Nov 22 - Nov 26", villa: "R-V y Alegre", type: "mixed", status: "completed", checkIn: "2025-11-22", nights: 4 },
+            { id: 2, name: "Reservación VV", dates: "Nov 22 - Nov 29", villa: "Villa Verano (VV)", type: "vv", status: "completed", checkIn: "2025-11-22", nights: 7 },
+            { id: 3, name: "Jonathan", dates: "Nov 27 - Dic 4", villa: "Beach House (BH)", type: "bh", status: "completed", checkIn: "2025-11-27", nights: 7 },
+            { id: 4, name: "John Chuards", dates: "Dic 11 - Dic 25", villa: "Beach House (BH)", type: "bh", status: "completed", checkIn: "2025-12-11", nights: 14 },
+            { id: 5, name: "Jibril Yones", dates: "Dic 12 - Dic 17", villa: "Villa Verano (VV)", type: "vv", status: "completed", checkIn: "2025-12-12", nights: 5 },
+            { id: 6, name: "Keneth", dates: "Dic 26 - Ene 3", villa: "Beach House (BH)", type: "bh", status: "active", checkIn: "2025-12-26", nights: 8 },
+            { id: 7, name: "Carolin Robinson", dates: "Dic 27 - Ene 4", villa: "Villa Verano (VV)", type: "vv", status: "active", checkIn: "2025-12-27", nights: 8 },
+            { id: 8, name: "Greg Leeh", dates: "Ene 4 - Ene 7", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-01-04", nights: 3 },
+            { id: 9, name: "Tereza Leeh", dates: "Ene 4 - Ene 10", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-01-04", nights: 6 },
+            { id: 10, name: "Ken Angor", dates: "Ene 10 - Ene 24", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-01-10", nights: 14 },
+            { id: 11, name: "Ronald B.", dates: "Ene 25 - Feb 1", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-01-25", nights: 7 },
+            { id: 12, name: "Cristina Dueñas", dates: "Ene 28 - Feb 1", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-01-28", nights: 4 },
+            { id: 13, name: "Melisa G.", dates: "Feb 6 - Feb 14", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-02-06", nights: 8 },
+            { id: 14, name: "Melisa G. (Andy D.)", dates: "Feb 14 - Feb 19", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-02-14", nights: 5 },
+            { id: 15, name: "Cherry Cliford", dates: "Feb 14 - Feb 21", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-02-14", nights: 7 },
+            { id: 16, name: "Mike Walter", dates: "Feb 19 - Feb 23", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-02-19", nights: 4 },
+            { id: 17, name: "Darci D.", dates: "Feb 21 - Feb 28", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-02-21", nights: 7 },
+            { id: 18, name: "John Chuards", dates: "Feb 23 - Mar 16", villa: "Beach House (BH)", type: "bh", status: "upcoming", checkIn: "2026-02-23", nights: 21 },
+            { id: 19, name: "Gay Trata", dates: "Mar 6 - Mar 10", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-03-06", nights: 4 },
+            { id: 20, name: "Cherry Mackinons", dates: "Abr 13 - Abr 19", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-04-13", nights: 6 },
+            { id: 21, name: "Michelle C.", dates: "Abr 23 - Abr 27", villa: "Todas las Villas", type: "all", status: "upcoming", checkIn: "2026-04-23", nights: 4 },
+            { id: 22, name: "Lori Arzola", dates: "Abr 27 - May 3", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-04-27", nights: 6 },
+            { id: 23, name: "Viki Sol", dates: "May 5 - May 10", villa: "VV y BH", type: "mixed", status: "upcoming", checkIn: "2026-05-05", nights: 5 },
+            { id: 24, name: "Patricia S.", dates: "May 12 - May 16", villa: "Todas las Villas", type: "all", status: "upcoming", checkIn: "2026-05-12", nights: 4 },
+            { id: 25, name: "Robert J.", dates: "May 21 - May 26", villa: "Villa Verano (VV)", type: "vv", status: "upcoming", checkIn: "2026-05-21", nights: 5 },
+            { id: 26, name: "Pool H.", dates: "May 28 - Jun 1", villa: "Todas las Villas", type: "all", status: "upcoming", checkIn: "2026-05-28", nights: 4 },
+        ];
+
+        const VILLA_COLORS = {
+            vv: "bg-emerald-100 text-emerald-800 border-emerald-200",
+            bh: "bg-blue-100 text-blue-800 border-blue-200",
+            all: "bg-purple-100 text-purple-800 border-purple-200",
+            mixed: "bg-orange-100 text-orange-800 border-orange-200",
+        };
+
+        const VILLA_LABELS = {
+            vv: "Villa Verano",
+            bh: "Beach House",
+            all: "Completa",
+            mixed: "Mixta",
+        };
+
+        function VillaManager() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [selectedBooking, setSelectedBooking] = useState(null);
+            const [filter, setFilter] = useState('all');
+
+            const filteredBookings = useMemo(() => {
+                let sorted = [...INITIAL_BOOKINGS].sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
+                if (filter === 'all') return sorted;
+                return sorted.filter(b => b.type === filter);
+            }, [filter]);
+
+            // Simulated today for consistent demo
+            const today = new Date("2026-01-03");
+
+            const getDaysUntil = (dateStr) => {
+                const checkIn = new Date(dateStr);
+                const diffTime = checkIn - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+            };
+
+            const getStatusBadge = (daysUntil) => {
+                if (daysUntil < 0) return { label: "Completado", color: "bg-gray-100 text-gray-500" };
+                if (daysUntil === 0) return { label: "¡Hoy!", color: "bg-green-500 text-white animate-pulse" };
+                if (daysUntil <= 7) return { label: `En ${daysUntil} días`, color: "bg-amber-100 text-amber-700 font-bold" };
+                return { label: `En ${daysUntil} días`, color: "bg-gray-100 text-gray-600" };
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+                    <header className="bg-white shadow-sm sticky top-0 z-20">
+                        <div className="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-teal-600 p-2 rounded-lg text-white">
+                                    <Palmtree />
+                                </div>
+                                <div>
+                                    <h1 className="text-xl font-bold text-slate-900 tracking-tight">VillaManager</h1>
+                                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Gestión de Itinerarios</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <button className="p-2 text-slate-400 hover:text-slate-600 transition-colors relative">
+                                    <Clock />
+                                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                                </button>
+                                <div className="h-8 w-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-xs border border-slate-300">
+                                    YO
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-5xl mx-auto px-4 py-8">
+                        <div className="mb-8">
+                            <h2 className="text-2xl font-bold text-slate-800">Hola, Administrador</h2>
+                            <p className="text-slate-500">Aquí tienes el resumen de los grupos y sus estados.</p>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 w-full sm:w-auto">
+                                {['all', 'vv', 'bh', 'mixed', 'all_villas'].map((f) => (
+                                    <button
+                                        key={f}
+                                        onClick={() => setFilter(f === 'all_villas' ? 'all' : f)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                                            filter === (f === 'all_villas' ? 'all' : f) && f !== 'all_villas'
+                                            ? 'bg-slate-800 text-white shadow-md'
+                                            : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                                        }`}
+                                    >
+                                        {f === 'all' ? 'Todos' : VILLA_LABELS[f] || 'Otros'}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="text-sm text-slate-400 font-medium">
+                                Mostrando {filteredBookings.length} reservas
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredBookings.map((booking) => {
+                                const daysUntil = getDaysUntil(booking.checkIn);
+                                const status = getStatusBadge(daysUntil);
+                                const isPast = daysUntil < 0;
+
+                                return (
+                                    <div
+                                        key={booking.id}
+                                        onClick={() => setSelectedBooking(booking)}
+                                        className={`group bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:shadow-xl hover:border-teal-200 transition-all cursor-pointer relative overflow-hidden ${isPast ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                                    >
+                                        <div className={`absolute top-0 left-0 w-1 h-full ${booking.type === 'vv' ? 'bg-emerald-400' : booking.type === 'bh' ? 'bg-blue-400' : 'bg-purple-400'}`}></div>
+
+                                        <div className="flex justify-between items-start mb-3 pl-2">
+                                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md ${VILLA_COLORS[booking.type]}`}>
+                                                {VILLA_LABELS[booking.type]}
+                                            </span>
+                                            <span className={`text-xs font-semibold px-2 py-1 rounded-full ${status.color}`}>
+                                                {status.label}
+                                            </span>
+                                        </div>
+
+                                        <div className="pl-2 mb-4">
+                                            <h3 className="text-lg font-bold text-slate-800 group-hover:text-teal-700 transition-colors">
+                                                {booking.name}
+                                            </h3>
+                                            <div className="flex items-center text-slate-500 text-sm mt-1">
+                                                <Calendar size={14} className="mr-1.5" />
+                                                {booking.dates}
+                                            </div>
+                                            <div className="flex items-center text-slate-500 text-sm mt-1">
+                                                <Clock size={14} className="mr-1.5" />
+                                                {booking.nights} noches
+                                            </div>
+                                        </div>
+
+                                        <div className="pl-2 pt-4 border-t border-slate-100 flex justify-between items-center">
+                                            <div className="flex -space-x-2">
+                                                <div className="w-6 h-6 rounded-full bg-slate-300 border-2 border-white flex items-center justify-center text-[8px] text-slate-600">A</div>
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[8px] text-slate-600">+</div>
+                                            </div>
+                                            <div className="text-xs font-semibold text-teal-600 flex items-center">
+                                                Ver Carpeta <MoreHorizontal className="ml-1" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </main>
+
+                    {/* Modal */}
+                    {selectedBooking && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                            <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+                                <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-start relative">
+                                    <button
+                                        onClick={() => setSelectedBooking(null)}
+                                        className="absolute top-4 right-4 p-2 bg-white rounded-full text-slate-400 hover:text-red-500 shadow-sm transition-colors"
+                                    >
+                                        <X />
+                                    </button>
+
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <h2 className="text-2xl font-bold text-slate-800">{selectedBooking.name}</h2>
+                                            <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-md ${VILLA_COLORS[selectedBooking.type]}`}>
+                                                {selectedBooking.villa}
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-500 flex items-center gap-2">
+                                            <Calendar /> {selectedBooking.dates}
+                                            <span className="text-slate-300">|</span>
+                                            <Clock /> Check-in: 3:00 PM
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex border-b border-slate-200 bg-white sticky top-0">
+                                    <button className="flex-1 py-4 text-sm font-medium text-teal-600 border-b-2 border-teal-600 bg-teal-50/50">
+                                        Resumen & Itinerario
+                                    </button>
+                                    <button className="flex-1 py-4 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+                                        Lista de Compras
+                                    </button>
+                                    <button className="flex-1 py-4 text-sm font-medium text-slate-500 hover:text-slate-800 transition-colors">
+                                        Hitos y Alarmas
+                                    </button>
+                                </div>
+
+                                <div className="overflow-y-auto p-6 flex-1 bg-white">
+                                    <div className="mb-8">
+                                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                            <MapIcon /> Itinerario Propuesto
+                                        </h3>
+                                        <div className="space-y-4 relative before:absolute before:left-[15px] before:top-2 before:h-full before:w-[2px] before:bg-slate-100">
+                                            <div className="relative pl-10">
+                                                <div className="absolute left-0 top-0 w-8 h-8 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center border-4 border-white shadow-sm z-10">
+                                                    1
+                                                </div>
+                                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                                    <div className="flex justify-between mb-2">
+                                                        <span className="font-bold text-slate-700">Llegada & Check-in</span>
+                                                        <span className="text-xs text-slate-400">15:00 PM</span>
+                                                    </div>
+                                                    <p className="text-sm text-slate-600">Bienvenida con cócteles. Tour por la {selectedBooking.villa}.</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="relative pl-10">
+                                                <div className="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-slate-400 flex items-center justify-center border-4 border-slate-100 z-10 font-bold text-xs">
+                                                    2
+                                                </div>
+                                                <div className="bg-white p-4 rounded-xl border border-slate-100">
+                                                    <div className="flex justify-between mb-2">
+                                                        <span className="font-bold text-slate-700">Día de Playa</span>
+                                                        <span className="text-xs text-slate-400">10:00 AM</span>
+                                                    </div>
+                                                    <p className="text-sm text-slate-600">Reservación en club de playa local. Transporte coordinado.</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="relative pl-10">
+                                                <div className="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-slate-400 flex items-center justify-center border-4 border-slate-100 z-10 font-bold text-xs">
+                                                    3
+                                                </div>
+                                                <div className="bg-white p-4 rounded-xl border border-slate-100">
+                                                    <div className="flex justify-between mb-2">
+                                                        <span className="font-bold text-slate-700">Cena Especial</span>
+                                                        <span className="text-xs text-slate-400">20:00 PM</span>
+                                                    </div>
+                                                    <p className="text-sm text-slate-600">Chef privado en la villa. Menú de mariscos locales.</p>
+                                                </div>
+                                            </div>
+
+                                            <button className="ml-10 text-sm text-teal-600 font-medium hover:underline flex items-center gap-1">
+                                                <Plus /> Agregar evento al itinerario
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                            <ShoppingBag /> Lista de Compras (Preview)
+                                        </h3>
+                                        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                                            <ul className="space-y-2">
+                                                <li className="flex items-center gap-3 text-sm text-slate-700">
+                                                    <div className="w-4 h-4 rounded border border-orange-300 bg-white"></div>
+                                                    Agua Mineral (2 Cajas)
+                                                </li>
+                                                <li className="flex items-center gap-3 text-sm text-slate-700">
+                                                    <div className="w-4 h-4 rounded border border-orange-300 bg-white"></div>
+                                                    Cervezas Locales
+                                                </li>
+                                                <li className="flex items-center gap-3 text-sm text-slate-700">
+                                                    <div className="w-4 h-4 rounded border border-orange-300 bg-white"></div>
+                                                    Fruta de temporada
+                                                </li>
+                                            </ul>
+                                            <button className="mt-3 text-xs font-bold text-orange-600 uppercase tracking-wide">Ver lista completa</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+                                    <span className="text-xs text-slate-400">Última actualización: Hoy, 10:42 AM</span>
+                                    <button className="bg-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-lg hover:bg-slate-800 transition-colors">
+                                        Editar Reserva
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<VillaManager />);
+    </script>
+</body>
+</html>

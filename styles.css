@@ -1,0 +1,207 @@
+﻿:root{
+  --carmine: #B22234; /* rojo carmín */
+  --turq: #00F2D6;    /* turquesa neón */
+  --cream: #FFF8ED;   /* blanco crema */
+  --dark: #0F1724;    /* negro grisáceo */
+  --muted: #6B7280;
+
+  /* semantic tokens (can be swapped by theme classes) */
+  --primary: var(--turq);
+  --primary-contrast: var(--dark);
+  --secondary: var(--carmine);
+  --secondary-contrast: var(--cream);
+  --bg: var(--cream);
+}
+
+/* Theme: swap primary <-> secondary (carmine primary variant) */
+.theme-carmine-primary{
+  --primary: var(--carmine);
+  --primary-contrast: var(--cream);
+  --secondary: var(--turq);
+  --secondary-contrast: var(--dark);
+}
+
+*{box-sizing:border-box}
+body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";margin:0;background:var(--bg);color:var(--dark)}
+.container{max-width:1100px;margin:0 auto;padding:28px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.header .meta{display:flex;gap:12px;align-items:center}
+
+.pill{background:#fff;border:1px solid rgba(15,23,42,0.04);padding:8px 12px;border-radius:999px;margin-right:8px;cursor:pointer;color:var(--dark)}
+.pill.active{background:var(--secondary);color:var(--secondary-contrast);border-color:transparent;box-shadow:0 10px 30px rgba(0,0,0,0.06)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{background:#fff;border:1px solid rgba(15,23,42,0.04);padding:14px;border-radius:14px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease}
+.card:hover{transform:translateY(-6px);box-shadow:0 30px 40px rgba(0,0,0,0.06)}
+.row{display:flex;gap:12px;align-items:center}
+.date{width:56px;text-align:center}
+.date small{display:block;color:var(--muted);font-size:12px}
+.date strong{display:block;font-size:18px}
+.meta{flex:1}
+.badge{display:inline-block;padding:6px 10px;border-radius:10px;background:linear-gradient(90deg,#fff,#fff);font-size:13px;border:1px solid rgba(15,23,42,0.03);color:var(--dark)}
+.foot{margin-top:12px;color:var(--muted);font-size:13px}
+.search{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.06);margin-bottom:12px;background:#fff}
+.empty{padding:18px;border-radius:12px;background:#fff;border:1px dashed rgba(15,23,42,0.04);text-align:center;color:var(--muted)}
+
+/* Primary button */
+.btn{background:var(--primary);color:var(--primary-contrast);padding:8px 12px;border-radius:10px;border:0;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,0.06);font-weight:600}
+.btn:focus{outline:3px solid color-mix(in srgb, var(--primary) 30%, transparent);outline-offset:3px}
+
+/* Secondary / danger styled with carmine */
+.btn.secondary{background:var(--secondary);color:var(--secondary-contrast);box-shadow:none}
+.btn.ghost{background:transparent;border:1px solid rgba(15,23,42,0.06);color:var(--muted)}
+.input-row{display:flex;gap:8px}
+.input-row input{flex:1;padding:8px;border-radius:10px;border:1px solid rgba(15,23,42,0.06)}
+.tabs{display:flex;border-bottom:1px solid rgba(15,23,42,0.04);background:#fff}
+.tab{flex:1;padding:14px;text-align:center;cursor:pointer;color:var(--muted)}
+.tab.active{color:var(--primary);border-bottom:3px solid var(--primary)}
+.list-item{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.03);margin-top:8px}
+.list-item.completed .text{text-decoration:line-through;color:var(--muted)}
+.list-item input{width:18px;height:18px}
+
+/* PANEL base styles */
+aside#panel{position:fixed;right:0;top:0;bottom:0;width:0;overflow:hidden;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;pointer-events:none}
+aside#panel.open{pointer-events:auto}
+aside#panel.modal .modal-content{transform:translateY(20px) scale(.98);opacity:0;animation:modal-in .22s ease forwards}
+aside#panel.drawer .modal-content{transform:translateX(30px);opacity:0;animation:drawer-in .22s ease forwards}
+
+@keyframes modal-in{to{transform:none;opacity:1}}
+@keyframes drawer-in{to{transform:none;opacity:1}}
+
+/* modal centered (small screens) */
+@media (max-width: 979px){
+  aside#panel{inset:0;background:rgba(15,23,42,0.55);padding:20px}
+  aside#panel .modal-content{width:100%;max-width:760px;background:linear-gradient(180deg,var(--cream),#fff);border-radius:16px;overflow:hidden;box-shadow:0 25px 80px rgba(2,6,23,0.28);max-height:90vh;display:flex;flex-direction:column}
+  aside#panel .modal-body{overflow:auto;padding:18px;flex:1}
+  aside#panel .modal-header{padding:18px;border-bottom:1px solid rgba(15,23,42,0.04);background:linear-gradient(135deg,var(--primary),var(--secondary));color:var(--primary-contrast)}
+  aside#panel .modal-footer{padding:12px;border-top:1px solid rgba(15,23,42,0.04);background:#fff}
+}
+
+/* drawer on wide screens */
+@media (min-width: 980px){
+  aside#panel{right:0;top:0;bottom:0;width:420px;background:linear-gradient(180deg,#fff,var(--cream));box-shadow: -30px 0 60px rgba(2,6,23,0.06);padding:0;border-left:1px solid rgba(15,23,42,0.04)}
+  aside#panel .modal-content{width:100%;height:100%;max-width:none;max-height:none;border-radius:0;display:flex;flex-direction:column}
+  aside#panel .modal-body{overflow:auto;padding:18px;flex:1}
+  aside#panel .modal-header{padding:18px;border-bottom:1px solid rgba(15,23,42,0.04);background:transparent;color:var(--dark)}
+  aside#panel.open{width:420px}
+}
+
+/* overlay click target */
+aside#panel.modal{display:flex;align-items:center;justify-content:center}
+
+/* small helpers */
+.modal-header .close-icon{background:rgba(2,6,23,0.06);width:38px;height:38px;border-radius:10px;display:inline-grid;place-items:center;cursor:pointer}
+
+/* subtle accents */
+.badge{background:linear-gradient(90deg,var(--cream),#fff);border-left:4px solid var(--secondary);}
+
+/* theme toggle button */
+.theme-toggle{padding:8px 10px;border-radius:10px;border:0;cursor:pointer;font-weight:600;background:transparent;color:var(--dark);border:2px solid rgba(15,23,42,0.05)}
+.theme-toggle:focus{outline:3px solid color-mix(in srgb,var(--primary) 30%, transparent);outline-offset:2px}
+
+
+/* Sunset background - large translucent scenic backdrop */
+body::before{\n  content: '';\n  position: fixed;\n  inset: 0;\n  z-index: -3;\n  pointer-events: none;\n  background-image: radial-gradient(circle at 50% 72%, rgba(255,229,185,0.92) 0%, rgba(255,196,128,0.7) 8%, rgba(255,145,92,0.55) 20%, rgba(178,34,52,0.28) 36%, rgba(0,0,0,0.0) 70%), linear-gradient(180deg, rgba(178,34,52,0.04) 0%, rgba(0,242,214,0.03) 40%, rgba(2,6,23,0.03) 100%);\n  background-repeat: no-repeat;\n  background-size: cover, cover;\n  filter: blur(8px) saturate(1.02);\n  opacity: 0.85;\n  transform-origin: center;\n}\n\nbody::after{\n  content: '';\n  position: fixed;\n  left: 50%;\n  bottom: -8vh;\n  width: 48vmax;\n  height: 48vmax;\n  transform: translateX(-50%);\n  z-index: -2;\n  pointer-events: none;\n  background: radial-gradient(circle at 50% 40%, rgba(255,215,160,0.85) 0%, rgba(255,140,90,0.45) 20%, rgba(178,34,52,0.25) 40%, rgba(0,0,0,0) 60%);\n  filter: blur(18px);\n  opacity: 0.7;\n  animation: sunFloat 30s ease-in-out infinite;\n}\n\n@keyframes sunFloat{\n  0%{ transform: translateX(-50%) translateY(0) scale(1); }\n  50%{ transform: translateX(-50%) translateY(-10px) scale(1.01); }\n  100%{ transform: translateX(-50%) translateY(0) scale(1); }\n}\n\n/* Soft cloud layers for motion */\n.sunset-cloud{ position: fixed; left: -10%; top: 8%; width: 120%; height: 24vh; z-index:-2; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); filter: blur(22px); opacity:0.75; animation: cloudDrift 80s linear infinite; }\n.sunset-cloud.cloud-2{ top: 20%; opacity:0.55; transform: scale(1.1); animation-duration: 110s; }\n\n@keyframes cloudDrift{ from { transform: translateX(0) } to { transform: translateX(-10%) } }\n\n/* subtle palms silhouette */\n.sunset-silhouette{ position: fixed; left: 0; bottom: 0; height: 18vh; width:100%; background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.06)); z-index:-1; pointer-events:none }
+.palms{ position: fixed; right: 6%; bottom: 2%; width: 220px; height: 160px; opacity: 0.18; z-index: -1; pointer-events: none; }
+
+/* layout improvements */
+.grid{grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));}
+.container{ padding:32px; }
+
+/* Calendar tweaks */
+#calendar{width:320px;min-width:220px}
+#calendar .cal-header{font-weight:700;color:var(--dark)}
+#calendar .cal-day{padding:10px;border-radius:8px;text-align:center;font-size:13px;color:var(--muted);min-height:42px}
+#calendar .cal-day.has-group{padding-top:8px; padding-bottom:8px}
+#calendar .cal-nav button{font-weight:700}
+
+@keyframes sunFloat{
+  0%{ transform: translateX(-50%) translateY(0) scale(1); }
+  50%{ transform: translateX(-50%) translateY(-14px) scale(1.02); }
+  100%{ transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* Soft cloud layers for motion */
+.sunset-cloud{ position: fixed; left: -10%; top: 8%; width: 120%; height: 30vh; z-index:-2; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); filter: blur(28px); opacity:0.9; animation: cloudDrift 60s linear infinite; }
+.sunset-cloud.cloud-2{ top: 22%; opacity:0.6; transform: scale(1.2); animation-duration: 90s; }
+
+@keyframes cloudDrift{ from { transform: translateX(0) } to { transform: translateX(-12%) } }
+
+/* Glass effect on the main container so content feels translucent over the sunset */
+.container{ background: rgba(255,255,255,0.66); backdrop-filter: blur(6px) saturate(1.08); border-radius:14px; box-shadow: 0 10px 40px rgba(2,6,23,0.07); }
+
+/* Slight color tweak for headers to harmonize with sunset */
+.header h1, .header p{ color: var(--dark); }
+
+/* Make the page edges feel softer on mobile */
+@media (max-width: 600px){
+  body::before{\n  content: '';\n  position: fixed;\n  inset: 0;\n  z-index: -3;\n  pointer-events: none;\n  background-image: radial-gradient(circle at 50% 72%, rgba(255,229,185,0.92) 0%, rgba(255,196,128,0.7) 8%, rgba(255,145,92,0.55) 20%, rgba(178,34,52,0.28) 36%, rgba(0,0,0,0.0) 70%), linear-gradient(180deg, rgba(178,34,52,0.04) 0%, rgba(0,242,214,0.03) 40%, rgba(2,6,23,0.03) 100%);\n  background-repeat: no-repeat;\n  background-size: cover, cover;\n  filter: blur(8px) saturate(1.02);\n  opacity: 0.85;\n  transform-origin: center;\n}\n\nbody::after{\n  content: '';\n  position: fixed;\n  left: 50%;\n  bottom: -8vh;\n  width: 48vmax;\n  height: 48vmax;\n  transform: translateX(-50%);\n  z-index: -2;\n  pointer-events: none;\n  background: radial-gradient(circle at 50% 40%, rgba(255,215,160,0.85) 0%, rgba(255,140,90,0.45) 20%, rgba(178,34,52,0.25) 40%, rgba(0,0,0,0) 60%);\n  filter: blur(18px);\n  opacity: 0.7;\n  animation: sunFloat 30s ease-in-out infinite;\n}\n\n@keyframes sunFloat{\n  0%{ transform: translateX(-50%) translateY(0) scale(1); }\n  50%{ transform: translateX(-50%) translateY(-10px) scale(1.01); }\n  100%{ transform: translateX(-50%) translateY(0) scale(1); }\n}\n\n/* Soft cloud layers for motion */\n.sunset-cloud{ position: fixed; left: -10%; top: 8%; width: 120%; height: 24vh; z-index:-2; pointer-events:none; background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)); filter: blur(22px); opacity:0.75; animation: cloudDrift 80s linear infinite; }\n.sunset-cloud.cloud-2{ top: 20%; opacity:0.55; transform: scale(1.1); animation-duration: 110s; }\n\n@keyframes cloudDrift{ from { transform: translateX(0) } to { transform: translateX(-10%) } }\n\n/* subtle palms silhouette */\n.sunset-silhouette{ position: fixed; left: 0; bottom: 0; height: 18vh; width:100%; background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.06)); z-index:-1; pointer-events:none }
+.palms{ position: fixed; right: 6%; bottom: 2%; width: 220px; height: 160px; opacity: 0.18; z-index: -1; pointer-events: none; }
+
+/* layout improvements */
+.grid{grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));}
+.container{ padding:32px; }
+
+/* Calendar tweaks */
+#calendar{width:320px;min-width:220px}
+#calendar .cal-header{font-weight:700;color:var(--dark)}
+#calendar .cal-day{padding:10px;border-radius:8px;text-align:center;font-size:13px;color:var(--muted);min-height:42px}
+#calendar .cal-day.has-group{padding-top:8px; padding-bottom:8px}
+#calendar .cal-nav button{font-weight:700}
+
+}
+
+/* Optional silhouette accent (subtle) */
+.sunset-silhouette{ position: fixed; left: 0; right: 0; bottom: 0; height: 20vh; background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.12)); z-index:-1; pointer-events:none }
+
+/* Calendar */
+#calendar{background:linear-gradient(180deg,rgba(255,255,255,0.6),rgba(255,255,255,0.45));padding:12px;border-radius:12px;border:1px solid rgba(15,23,42,0.04)}
+#calendar .cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#calendar .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+#calendar .cal-day{padding:8px;border-radius:8px;text-align:center;font-size:13px;color:var(--muted)}
+#calendar .cal-day.today{border:2px solid var(--primary);font-weight:700;color:var(--primary-contrast)}
+#calendar .cal-day.has-group{background:linear-gradient(90deg,var(--primary),color-mix(in srgb,var(--primary) 55%, #fff));color:var(--primary-contrast);box-shadow:0 8px 22px rgba(0,0,0,0.06)}
+#calendar .cal-nav button{background:transparent;border:0;padding:6px;cursor:pointer;color:var(--dark)}
+
+/* New Group modal */
+#newGroupModal .modal-wrap{width:100%;max-width:540px;background:linear-gradient(180deg,#fff,#fbfdff);border-radius:14px;padding:18px;box-shadow:0 30px 60px rgba(2,6,23,0.18)}
+#newGroupModal .form-row{display:flex;gap:8px;margin-bottom:10px}
+#newGroupModal label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+#newGroupModal input[type='text'], #newGroupModal input[type='date'], #newGroupModal select{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(15,23,42,0.06)}
+#newGroupModal .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+
+/* calendar chips */
+.cal-chips{display:flex;gap:4px;justify-content:center;margin-top:6px}
+.cal-chip{width:10px;height:10px;border-radius:50%;box-shadow:0 6px 12px rgba(2,6,23,0.06);border:1px solid rgba(255,255,255,0.4)}
+.cal-chip.vv{background:linear-gradient(90deg,#dcfce7,#bbf7d0)}
+.cal-chip.bh{background:linear-gradient(90deg,#dbeafe,#bfdbfe)}
+.cal-chip.mixed{background:linear-gradient(90deg,#fff7ed,#ffedd5)}
+.cal-chip.all{background:linear-gradient(90deg,#f3e8ff,#e9d5ff)}
+
+
+/* Day panel (right drawer) improvements */
+#panel .panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.06)}
+#panel .panel-title{font-size:1.05rem;font-weight:600;color:var(--dark);}
+#panel .panel-sub{font-size:0.9rem;color:rgba(2,6,23,0.6)}
+#panel .panel-body{padding:16px;display:flex;flex-direction:column;gap:12px;overflow:auto;max-height:calc(100vh - 120px)}
+.day-panel .group-card{background:rgba(255,255,255,0.02);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;border:1px solid rgba(255,255,255,0.03)}
+.day-panel .group-top{display:flex;align-items:center;justify-content:space-between}
+.group-meta{font-size:0.85rem;color:rgba(2,6,23,0.55)}
+.group-name{font-weight:700;color:var(--dark);font-size:0.98rem}
+.btn-group{display:flex;gap:8px}
+.btn.small{padding:6px 10px;font-size:0.85rem;border-radius:8px}
+.btn.ghost.small{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+.confirm-delete{display:flex;gap:8px;align-items:center}
+.confirm-delete .warn{color:#ff6b6b;font-weight:700}
+#panel .empty{padding:20px;text-align:center;color:rgba(2,6,23,0.5)}
+@media(min-width:980px){#panel{width:420px;}}
+
+
+/* Calendar dropdown */
+.calendar-wrapper{position:relative;display:inline-block}
+.calendar-dropdown{min-width:260px;background:rgba(255,255,255,0.96);backdrop-filter:blur(6px);border-radius:10px;padding:10px;box-shadow:0 12px 30px rgba(2,6,23,0.28);border:1px solid rgba(2,6,23,0.06)}
+#calendarToggle[aria-expanded="true"]{box-shadow:inset 0 -2px 0 rgba(0,0,0,0.04)}
+@media(min-width:980px){
+  .calendar-wrapper{position:static}
+  .calendar-dropdown{position:static;display:block;box-shadow:none;background:transparent;padding:0;border:0}
+}

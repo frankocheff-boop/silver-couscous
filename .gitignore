@@ -1,0 +1,17 @@
+﻿# Ignore OS and editor files
+Thumbs.db
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# VSCode
+.vscode/
+
+# env
+.env
+
+# OneDrive temp files
+~$*
